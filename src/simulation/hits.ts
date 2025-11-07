@@ -59,9 +59,9 @@ export function rollHits(weapon: Weapon, attacks: number) {
 				hits++;
 			} else {
 				if (lethals) wounds++;
-				if (sustained1) hits++;
-				if (sustained2) hits += 2;
-				if (sustainedD3) hits += rollDie(3);
+				if (sustained1) hits += 2;
+				if (sustained2) hits += 3;
+				if (sustainedD3) hits += 1 + rollDie(3);
 			}
 		}
 	}
