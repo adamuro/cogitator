@@ -11,11 +11,11 @@ import {
 } from "@/components/ui/card";
 import { Field } from "@/components/ui/field";
 import {
-	useAttackerFieldArray,
+	useDefenderFieldArray,
 	useProfilesFormContext,
 } from "@/hooks/profiles";
 import { getDragIndices } from "@/lib/dnd";
-import { newWeapon } from "@/profiles/attacker/utils";
+import { newUnit } from "@/profiles/defender/utils";
 import {
 	DndContext,
 	type DragEndEvent,
@@ -30,25 +30,24 @@ import {
 	verticalListSortingStrategy,
 } from "@dnd-kit/sortable";
 import { Plus } from "lucide-react";
-import { useEffect } from "react";
 import {
 	Accordion,
 	AccordionContent,
 	AccordionItem,
 	AccordionTrigger,
-} from "../../components/ui/accordion";
-import { WeaponForm } from "./weapon";
+} from "../ui/accordion";
+import { UnitForm } from "./unit";
 
-export function AttackerCard() {
-	const attacker = useAttackerFieldArray();
+export function DefenderUnitCard() {
+	const defender = useDefenderFieldArray();
 
 	/* DnD Kit */
 	const sensors = useSensors(useSensor(TouchSensor), useSensor(MouseSensor));
 	function handleDragEnd(event: DragEndEvent) {
-		const indices = getDragIndices(attacker, event);
+		const indices = getDragIndices(defender, event);
 		if (!indices) return;
 
-		attacker.move(indices.from, indices.to);
+		defender.move(indices.from, indices.to);
 	}
 
 	return (
@@ -58,9 +57,9 @@ export function AttackerCard() {
 					<CardHeader>
 						<AccordionTrigger className="items-center py-0">
 							<div className="flex flex-col gap-2">
-								<CardTitle className="py-0">Attacker</CardTitle>
+								<CardTitle className="py-0">Defender</CardTitle>
 								<CardDescription>
-									Enter all weapon profiles of the attacking unit.
+									Enter all defensive profiles of the defending unit.
 								</CardDescription>
 							</div>
 						</AccordionTrigger>
@@ -73,16 +72,16 @@ export function AttackerCard() {
 								onDragEnd={handleDragEnd}
 							>
 								<SortableContext
-									items={attacker.fields.map((weapon) => weapon.id)}
+									items={defender.fields.map((unit) => unit.id)}
 									strategy={verticalListSortingStrategy}
 								>
 									<ul className="divide-y *:not-first:pt-4">
-										{attacker.fields.map((weapon, index) => (
-											<WeaponForm
-												key={weapon.id}
-												id={weapon.id}
+										{defender.fields.map((unit, index) => (
+											<UnitForm
+												key={unit.id}
+												id={unit.id}
 												index={index}
-												onRemove={() => attacker.remove(index)}
+												onRemove={() => defender.remove(index)}
 											/>
 										))}
 									</ul>
@@ -93,10 +92,10 @@ export function AttackerCard() {
 							<Field>
 								<Button
 									type="button"
-									onClick={() => attacker.append(newWeapon())}
+									onClick={() => defender.append(newUnit())}
 								>
 									<Plus />
-									Add Weapon
+									Add Defender
 								</Button>
 							</Field>
 						</CardFooter>

@@ -1,9 +1,7 @@
-"use client";
-
-import { ProfilesProvider } from "@/context/profiles";
+import { SimulationProvider } from "@/context/simulation";
 
 export default function Providers({
 	children,
 }: Readonly<{ children: React.ReactNode }>) {
-	return <ProfilesProvider>{children}</ProfilesProvider>;
+	return <SimulationProvider>{children}</SimulationProvider>;
 }

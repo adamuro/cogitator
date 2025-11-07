@@ -812,7 +812,7 @@ export const MultiSelect = React.forwardRef<MultiSelectRef, MultiSelectProps>(
 								"flex p-1 rounded-md border min-h-9 p-0.5 h-auto items-center justify-between bg-inherit hover:bg-inherit [&_svg]:pointer-events-auto",
 								autoSize ? "w-auto" : "w-full",
 								responsiveSettings.compactMode && "min-h-8 text-sm",
-								screenSize === "mobile" && "min-h-12 text-base",
+								screenSize === "mobile" && "min-h-9 text-base",
 								disabled && "opacity-50 cursor-not-allowed",
 								className,
 							)}
@@ -869,7 +869,7 @@ export const MultiSelect = React.forwardRef<MultiSelectRef, MultiSelectProps>(
 															responsiveSettings.compactMode &&
 																"text-xs px-1.5 py-0.5",
 															screenSize === "mobile" &&
-																"max-w-[120px] truncate",
+																"max-w-[200px] truncate",
 															singleLine && "flex-shrink-0 whitespace-nowrap",
 															"[&>svg]:pointer-events-auto",
 														)}

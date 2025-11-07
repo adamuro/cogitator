@@ -1,7 +1,8 @@
+"use client";
+
 import { Button } from "@/components/ui/button";
 import {
 	Field,
-	FieldDescription,
 	FieldError,
 	FieldGroup,
 	FieldLabel,
@@ -13,44 +14,35 @@ import {
 	InputGroupButton,
 	InputGroupInput,
 } from "@/components/ui/input-group";
-import { useWeapon } from "@/hooks/useWeapon";
-import { emptyNumberFieldValue } from "@/lib/form";
-import { randomWeaponName } from "@/lib/weapon";
-import {
-	DEFAULT_WEAPON_VALUES,
-	weaponSchema,
-	type WeaponSchemaType,
-} from "@/schemas/weapon";
-import {
-	KEYWORD_SELECT_OPTIONS,
-	type Keyword,
-	type KeywordType,
-	type Weapon,
-} from "@/types/weapon";
+import { useProfilesFormContext } from "@/hooks/profiles";
+import { processNumberFieldValue } from "@/lib/form";
+import { randomWeaponName } from "@/profiles/attacker/utils";
 import { useSortable } from "@dnd-kit/sortable";
 import { CSS } from "@dnd-kit/utilities";
-import { zodResolver } from "@hookform/resolvers/zod";
 import { EllipsisVertical, Trash } from "lucide-react";
 import { useMemo } from "react";
-import { Controller, useFieldArray, useForm } from "react-hook-form";
+import { Controller } from "react-hook-form";
+import {
+	KEYWORD_SELECT_OPTIONS,
+	MAX_SKILL,
+	MIN_AP,
+	MIN_SKILL,
+	MIN_STRENGTH,
+	MODIFIER_SELECT_OPTIONS,
+} from "../../profiles/attacker/constants";
 import { MultiSelect } from "../ui/multi-select";
-import { Badge } from "../ui/badge";
 
 interface WeaponProps {
-	id: Weapon["id"];
+	id: string;
+	index: number;
+	onRemove: () => void;
 }
 
 export function WeaponForm(props: WeaponProps) {
-	const weapon = useWeapon(props.id);
+	const form = useProfilesFormContext();
 	const placeholderName = useMemo(() => randomWeaponName(), []);
-	const form = useForm<WeaponSchemaType>({
-		resolver: zodResolver(weaponSchema),
-		mode: "onBlur",
-		values: weapon.values,
-		defaultValues: DEFAULT_WEAPON_VALUES,
-		resetOptions: { keepErrors: true },
-	});
 
+	/* DnD Kit Sortable */
 	const { attributes, listeners, setNodeRef, transform, transition } =
 		useSortable({ id: props.id });
 
@@ -61,222 +53,272 @@ export function WeaponForm(props: WeaponProps) {
 
 	return (
 		<li
+			key={props.id}
 			ref={setNodeRef}
 			style={style}
-			className="relative flex items-center space-x-4 py-4"
+			className="relative flex items-center space-x-4 space-y-6"
 		>
-			<form onSubmit={form.handleSubmit(() => null)} className="flex w-full">
-				<FieldGroup className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 2xl:grid-cols-5">
-					<Controller
-						name="attacks"
-						control={form.control}
-						render={({ field, fieldState }) => (
-							<Field data-invalid={fieldState.invalid}>
-								<FieldLabel>Attacks</FieldLabel>
-								<Input
+			<FieldGroup
+				key={props.id}
+				className="grid grid-cols-2 lg:grid-cols-3 2xl:grid-cols-5"
+			>
+				<Controller
+					name={`attacker.${props.index}.attacks`}
+					control={form.control}
+					render={({ field, fieldState }) => (
+						<Field data-invalid={fieldState.invalid}>
+							<FieldLabel>Attacks</FieldLabel>
+							<Input
+								{...field}
+								aria-invalid={fieldState.invalid}
+								placeholder="4, D6, 2D3"
+								autoComplete="off"
+								className="text-center"
+								onChange={(e) => field.onChange(e.target.value)}
+							/>
+							{fieldState.invalid && <FieldError errors={[fieldState.error]} />}
+						</Field>
+					)}
+				/>
+				<Controller
+					name={`attacker.${props.index}.skill`}
+					control={form.control}
+					render={({ field, fieldState }) => (
+						<Field data-invalid={fieldState.invalid}>
+							<FieldLabel>BS/WS</FieldLabel>
+							<InputGroup>
+								<InputGroupInput
 									{...field}
 									aria-invalid={fieldState.invalid}
-									placeholder="4, D6, 2D3"
+									type="number"
 									autoComplete="off"
 									className="text-center"
-									onChange={(e) => weapon.updateAttacks(e.target.value)}
+									onChange={(e) =>
+										field.onChange(
+											processNumberFieldValue(
+												e.target.value,
+												MIN_SKILL,
+												MAX_SKILL,
+											),
+										)
+									}
 								/>
-								<FieldDescription>
-									Enter the number of attacks of this weapon.
-								</FieldDescription>
-								{fieldState.invalid && (
-									<FieldError errors={[fieldState.error]} />
-								)}
-							</Field>
-						)}
-					/>
-					<Controller
-						name="skill"
-						control={form.control}
-						render={({ field, fieldState }) => (
-							<Field data-invalid={fieldState.invalid}>
-								<FieldLabel>BS/WS</FieldLabel>
-								<InputGroup>
-									<InputGroupInput
-										{...field}
-										aria-invalid={fieldState.invalid}
-										type="number"
-										placeholder="3+"
-										autoComplete="off"
-										className="text-center"
-										onChange={(e) => weapon.updateSkill(e.target.value)}
-									/>
-									<InputGroupAddon align="inline-start">
-										<InputGroupButton
-											onClick={() => weapon.updateSkill(field.value - 1)}
-										>
-											-
-										</InputGroupButton>
-									</InputGroupAddon>
-									<InputGroupAddon align="inline-end">
-										<InputGroupButton
-											onClick={() => weapon.updateSkill(field.value + 1)}
-										>
-											+
-										</InputGroupButton>
-									</InputGroupAddon>
-								</InputGroup>
-								<FieldDescription>
-									Enter the BS or WS of this weapon.
-								</FieldDescription>
-								{fieldState.invalid && (
-									<FieldError errors={[fieldState.error]} />
-								)}
-							</Field>
-						)}
-					/>
-					<Controller
-						name="strength"
-						control={form.control}
-						render={({ field, fieldState }) => (
-							<Field data-invalid={fieldState.invalid}>
-								<FieldLabel>Strength</FieldLabel>
-								<InputGroup>
-									<InputGroupInput
-										{...field}
-										aria-invalid={fieldState.invalid}
-										type="number"
-										autoComplete="off"
-										className="text-center"
-										onChange={(e) => weapon.updateStrength(e.target.value)}
-									/>
-									<InputGroupAddon align="inline-start">
-										<InputGroupButton
-											onClick={() => weapon.updateStrength(field.value - 1)}
-										>
-											-
-										</InputGroupButton>
-									</InputGroupAddon>
-									<InputGroupAddon align="inline-end">
-										<InputGroupButton
-											onClick={() => weapon.updateStrength(field.value + 1)}
-										>
-											+
-										</InputGroupButton>
-									</InputGroupAddon>
-								</InputGroup>
-								<FieldDescription>
-									Enter the strength of this weapon.
-								</FieldDescription>
-								{fieldState.invalid && (
-									<FieldError errors={[fieldState.error]} />
-								)}
-							</Field>
-						)}
-					/>
-					<Controller
-						name="ap"
-						control={form.control}
-						render={({ field, fieldState }) => (
-							<Field data-invalid={fieldState.invalid}>
-								<FieldLabel>AP</FieldLabel>
-								<InputGroup>
-									<InputGroupInput
-										{...field}
-										aria-invalid={fieldState.invalid}
-										type="number"
-										autoComplete="off"
-										className="text-center"
-										onChange={(e) => weapon.updateAp(e.target.value)}
-									/>
-									<InputGroupAddon align="inline-start">
-										<InputGroupButton
-											onClick={() => weapon.updateAp(field.value - 1)}
-										>
-											-
-										</InputGroupButton>
-									</InputGroupAddon>
-									<InputGroupAddon align="inline-end">
-										<InputGroupButton
-											onClick={() => weapon.updateAp(field.value + 1)}
-										>
-											+
-										</InputGroupButton>
-									</InputGroupAddon>
-								</InputGroup>
-								<FieldDescription>
-									Enter the AP of this weapon.
-								</FieldDescription>
-								{fieldState.invalid && (
-									<FieldError errors={[fieldState.error]} />
-								)}
-							</Field>
-						)}
-					/>
-					<Controller
-						name="damage"
-						control={form.control}
-						render={({ field, fieldState }) => (
-							<Field data-invalid={fieldState.invalid}>
-								<FieldLabel>Damage</FieldLabel>
-								<Input
+								<InputGroupAddon align="inline-start">
+									<InputGroupButton
+										onClick={() =>
+											field.onChange(
+												Math.max(MIN_SKILL, Number(field.value) - 1),
+											)
+										}
+									>
+										-
+									</InputGroupButton>
+								</InputGroupAddon>
+								<InputGroupAddon align="inline-end">
+									<InputGroupButton
+										onClick={() =>
+											field.onChange(
+												Math.min(MAX_SKILL, Number(field.value) + 1),
+											)
+										}
+									>
+										+
+									</InputGroupButton>
+								</InputGroupAddon>
+							</InputGroup>
+							{fieldState.invalid && <FieldError errors={[fieldState.error]} />}
+						</Field>
+					)}
+				/>
+				<Controller
+					name={`attacker.${props.index}.strength`}
+					control={form.control}
+					render={({ field, fieldState }) => (
+						<Field data-invalid={fieldState.invalid}>
+							<FieldLabel>Strength</FieldLabel>
+							<InputGroup>
+								<InputGroupInput
 									{...field}
 									aria-invalid={fieldState.invalid}
-									placeholder="4, D6, 2D3"
+									type="number"
 									autoComplete="off"
 									className="text-center"
-									onChange={(e) => weapon.updateDamage(e.target.value)}
+									onChange={(e) =>
+										field.onChange(
+											processNumberFieldValue(e.target.value, MIN_STRENGTH),
+										)
+									}
 								/>
-								<FieldDescription>
-									Enter damage of this weapon.
-								</FieldDescription>
-								{fieldState.invalid && (
-									<FieldError errors={[fieldState.error]} />
-								)}
-							</Field>
-						)}
-					/>
-					<Controller
-						name="name"
-						control={form.control}
-						render={({ field, fieldState }) => (
-							<Field data-invalid={fieldState.invalid}>
-								<FieldLabel>Name</FieldLabel>
-								<Input
+								<InputGroupAddon align="inline-start">
+									<InputGroupButton
+										onClick={() =>
+											field.onChange(
+												Math.max(MIN_STRENGTH, Number(field.value) - 1),
+											)
+										}
+									>
+										-
+									</InputGroupButton>
+								</InputGroupAddon>
+								<InputGroupAddon align="inline-end">
+									<InputGroupButton
+										onClick={() =>
+											field.onChange(
+												Math.min(MAX_SKILL, Number(field.value) + 1),
+											)
+										}
+									>
+										+
+									</InputGroupButton>
+								</InputGroupAddon>
+							</InputGroup>
+							{fieldState.invalid && <FieldError errors={[fieldState.error]} />}
+						</Field>
+					)}
+				/>
+				<Controller
+					name={`attacker.${props.index}.ap`}
+					control={form.control}
+					render={({ field, fieldState }) => (
+						<Field data-invalid={fieldState.invalid}>
+							<FieldLabel>AP</FieldLabel>
+							<InputGroup>
+								<InputGroupInput
 									{...field}
 									aria-invalid={fieldState.invalid}
-									placeholder={placeholderName}
+									type="number"
 									autoComplete="off"
 									className="text-center"
-									onChange={(e) => weapon.updateName(e.target.value)}
+									onChange={(e) =>
+										field.onChange(
+											processNumberFieldValue(e.target.value, MIN_AP),
+										)
+									}
 								/>
-								<FieldDescription>
-									Enter the name of this weapon.
-								</FieldDescription>
-								{fieldState.invalid && (
-									<FieldError errors={[fieldState.error]} />
-								)}
-							</Field>
-						)}
-					/>
-					<Field className="sm:col-span-2 2xl:col-span-3">
-						<FieldLabel>Keywords</FieldLabel>
-						<MultiSelect
-							options={KEYWORD_SELECT_OPTIONS}
-							onValueChange={(value) =>
-								weapon.updateKeywords(value as KeywordType[])
-							}
-							maxCount={2}
-							hideSelectAll
-						/>
-						<FieldDescription>
-							Select keywords for this weapon.
-						</FieldDescription>
-					</Field>
-					<Field className="sm:col-span-2 lg:col-span-1">
-						<FieldLabel>&nbsp;</FieldLabel>
-						<Button variant="destructive" onClick={() => weapon.remove()}>
-							<Trash /> Remove
-						</Button>
-					</Field>
-				</FieldGroup>
-			</form>
+								<InputGroupAddon align="inline-start">
+									<InputGroupButton
+										onClick={() =>
+											field.onChange(Math.max(MIN_AP, Number(field.value) - 1))
+										}
+									>
+										-
+									</InputGroupButton>
+								</InputGroupAddon>
+								<InputGroupAddon align="inline-end">
+									<InputGroupButton
+										onClick={() => field.onChange(Number(field.value) + 1)}
+									>
+										+
+									</InputGroupButton>
+								</InputGroupAddon>
+							</InputGroup>
+							{fieldState.invalid && <FieldError errors={[fieldState.error]} />}
+						</Field>
+					)}
+				/>
+				<Controller
+					name={`attacker.${props.index}.damage`}
+					control={form.control}
+					render={({ field, fieldState }) => (
+						<Field data-invalid={fieldState.invalid}>
+							<FieldLabel>Damage</FieldLabel>
+							<Input
+								{...field}
+								aria-invalid={fieldState.invalid}
+								placeholder="4, D6, 2D3"
+								autoComplete="off"
+								className="text-center"
+								onChange={(e) => field.onChange(e.target.value)}
+							/>
+							{fieldState.invalid && <FieldError errors={[fieldState.error]} />}
+						</Field>
+					)}
+				/>
+				<Controller
+					name={`attacker.${props.index}.name`}
+					control={form.control}
+					render={({ field, fieldState }) => (
+						<Field data-invalid={fieldState.invalid} className="lg:hidden">
+							<FieldLabel>Name</FieldLabel>
+							<Input
+								{...field}
+								aria-invalid={fieldState.invalid}
+								placeholder={placeholderName}
+								autoComplete="off"
+								className="text-center"
+								onChange={(e) => field.onChange(e.target.value)}
+							/>
+							{fieldState.invalid && <FieldError errors={[fieldState.error]} />}
+						</Field>
+					)}
+				/>
+				<Controller
+					name={`attacker.${props.index}.keywords`}
+					control={form.control}
+					render={({ field, fieldState }) => (
+						<Field
+							data-invalid={fieldState.invalid}
+							className="col-span-2 2xl:col-span-4"
+						>
+							<FieldLabel>Keywords</FieldLabel>
+							<MultiSelect
+								{...field}
+								defaultValue={field.value}
+								options={KEYWORD_SELECT_OPTIONS}
+								onValueChange={(value) => field.onChange(value)}
+								aria-invalid={fieldState.invalid}
+								hideSelectAll
+							/>
+						</Field>
+					)}
+				/>
+				<Controller
+					name={`attacker.${props.index}.name`}
+					control={form.control}
+					render={({ field, fieldState }) => (
+						<Field data-invalid={fieldState.invalid} className="hidden lg:flex">
+							<FieldLabel>Name</FieldLabel>
+							<Input
+								{...field}
+								aria-invalid={fieldState.invalid}
+								placeholder={placeholderName}
+								autoComplete="off"
+								className="text-center"
+								onChange={(e) => field.onChange(e.target.value)}
+							/>
+							{fieldState.invalid && <FieldError errors={[fieldState.error]} />}
+						</Field>
+					)}
+				/>
+				<Controller
+					name={`attacker.${props.index}.modifiers`}
+					control={form.control}
+					render={({ field, fieldState }) => (
+						<Field
+							data-invalid={fieldState.invalid}
+							className="col-span-2 2xl:col-span-4"
+						>
+							<FieldLabel>Modifiers</FieldLabel>
+							<MultiSelect
+								{...field}
+								defaultValue={field.value}
+								options={MODIFIER_SELECT_OPTIONS}
+								onValueChange={(value) => field.onChange(value)}
+								aria-invalid={fieldState.invalid}
+								hideSelectAll
+							/>
+						</Field>
+					)}
+				/>
+				<Field className="col-span-2 lg:col-span-1">
+					<FieldLabel className="h-0 lg:h-fit">&nbsp;</FieldLabel>
+					<Button type="button" variant="destructive" onClick={props.onRemove}>
+						<Trash /> Remove
+					</Button>
+				</Field>
+			</FieldGroup>
 			<Button
+				type="button"
 				variant="ghost"
 				{...listeners}
 				{...attributes}

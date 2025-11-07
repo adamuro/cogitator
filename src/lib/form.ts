@@ -1,10 +1,3 @@
-/**
- * Processes a number field value from a form input.
- * @param value The value to process.
- * @param min The minimum allowed value.
- * @param max The maximum allowed value.
- * @returns The processed number value.
- */
 export function processNumberFieldValue(
 	value: string | number,
 	min?: number,
@@ -13,6 +6,7 @@ export function processNumberFieldValue(
 	if (value === "") return emptyNumberFieldValue();
 
 	const number = Math.round(Number(value));
+	if (Number.isNaN(number)) return emptyNumberFieldValue();
 	if (min !== undefined && number < min) return min;
 	if (max !== undefined && number > max) return max;
 	return number;

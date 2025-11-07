@@ -8,5 +8,5 @@ export default {
 	dbCredentials: {
 		url: env.DATABASE_URL,
 	},
-	tablesFilter: ["40k-sim_*"],
+	tablesFilter: ["cogitator_*"],
 } satisfies Config;
