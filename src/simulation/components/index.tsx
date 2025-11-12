@@ -34,7 +34,7 @@ export function SimulationCard() {
 				</CardDescription>
 			</CardHeader>
 			<CardContent>
-				{simulation.result && (
+				{simulation.result?.weaponResults && (
 					<div>
 						<p>Simulated {simulation.runs} times</p>
 						<p>Average attacks: {simulation.result.summary.attacks}</p>
@@ -42,6 +42,15 @@ export function SimulationCard() {
 						<p>Average wounds: {simulation.result.summary.wounds}</p>
 					</div>
 				)}
+				{simulation.result?.weaponResults &&
+					Object.entries(simulation.result.weaponResults).map(([name, res]) => (
+						<div key={name} className="mt-4">
+							<h3 className="font-semibold">{name}</h3>
+							<p>Average attacks: {res.attacks}</p>
+							<p>Average hits: {res.hits}</p>
+							<p>Average wounds: {res.wounds}</p>
+						</div>
+					))}
 			</CardContent>
 		</Card>
 	);

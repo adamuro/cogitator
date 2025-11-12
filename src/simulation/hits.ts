@@ -3,12 +3,12 @@ import { rollDie } from "./dice";
 import { KeywordEnum, ModifierEnum } from "@/profiles/attacker/constants";
 
 export function getHitKeywords(weapon: Weapon) {
-	const lethals = weapon.keywords.includes(KeywordEnum.LethalHits);
+	const lethalHits = weapon.keywords.includes(KeywordEnum.LethalHits);
 	const sustained1 = weapon.keywords.includes(KeywordEnum.SustainedHits1);
 	const sustained2 = weapon.keywords.includes(KeywordEnum.SustainedHits2);
 	const sustainedD3 = weapon.keywords.includes(KeywordEnum.SustainedHitsD3);
 
-	return { lethals, sustained1, sustained2, sustainedD3 };
+	return { lethalHits, sustained1, sustained2, sustainedD3 };
 }
 
 export function getHitModifiers(weapon: Weapon) {
@@ -25,14 +25,6 @@ export function getCriticalHitMinRoll(weapon: Weapon) {
 	return weapon.modifiers.includes(ModifierEnum.HitsCritOn5) ? 5 : 6;
 }
 
-export function rerollsHits(weapon: Weapon) {
-	return (
-		weapon.modifiers.includes(ModifierEnum.ReRollOnesToHit) ||
-		weapon.modifiers.includes(ModifierEnum.ReRollFailedHits) ||
-		weapon.modifiers.includes(ModifierEnum.ReRollNonCritHits)
-	);
-}
-
 export function shouldRerollHit(roll: number, weapon: Weapon) {
 	const { rerollOnes, rerollFailed, rerollNonCrit } = getHitModifiers(weapon);
 	if (rerollOnes && roll === 1) return true;
@@ -43,10 +35,10 @@ export function shouldRerollHit(roll: number, weapon: Weapon) {
 
 export function rollHits(weapon: Weapon, attacks: number) {
 	let hits = 0;
-	let wounds = 0;
+	let lethals = 0;
 
 	const critOn = getCriticalHitMinRoll(weapon);
-	const { lethals, sustained1, sustained2, sustainedD3 } =
+	const { lethalHits, sustained1, sustained2, sustainedD3 } =
 		getHitKeywords(weapon);
 
 	for (let i = 0; i < attacks; i++) {
@@ -55,10 +47,10 @@ export function rollHits(weapon: Weapon, attacks: number) {
 		if (roll >= weapon.skill && roll < critOn) {
 			hits++;
 		} else if (roll >= critOn) {
-			if (!lethals && !sustained1 && !sustained2 && !sustainedD3) {
+			if (!lethalHits && !sustained1 && !sustained2 && !sustainedD3) {
 				hits++;
 			} else {
-				if (lethals) wounds++;
+				if (lethalHits) lethals++;
 				if (sustained1) hits += 2;
 				if (sustained2) hits += 3;
 				if (sustainedD3) hits += 1 + rollDie(3);
@@ -66,5 +58,5 @@ export function rollHits(weapon: Weapon, attacks: number) {
 		}
 	}
 
-	return { hits, wounds };
+	return { hits, lethals };
 }

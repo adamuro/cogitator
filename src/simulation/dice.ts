@@ -9,7 +9,6 @@ export function diceRollSumStr(dice: string): number {
 	}
 
 	let result = 0;
-	console.log(times);
 	for (let i = 0; i < (times || 1); i++) {
 		result += rollDie(sides);
 	}
