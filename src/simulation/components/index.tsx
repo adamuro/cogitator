@@ -6,6 +6,15 @@ import {
 	CardHeader,
 	CardTitle,
 } from "@/components/ui/card";
+import {
+	Table,
+	TableBody,
+	TableCaption,
+	TableCell,
+	TableHead,
+	TableHeader,
+	TableRow,
+} from "@/components/ui/table";
 import { useProfilesFormState } from "@/hooks/profiles";
 import { useSimulation } from "@/hooks/simulation";
 import { Play } from "lucide-react";
@@ -34,23 +43,33 @@ export function SimulationCard() {
 				</CardDescription>
 			</CardHeader>
 			<CardContent>
-				{simulation.result?.weaponResults && (
-					<div>
-						<p>Simulated {simulation.runs} times</p>
-						<p>Average attacks: {simulation.result.summary.attacks}</p>
-						<p>Average hits: {simulation.result.summary.hits}</p>
-						<p>Average wounds: {simulation.result.summary.wounds}</p>
-					</div>
+				{simulation.result && (
+					<Table>
+						<TableCaption>Simulated {simulation.runs} times</TableCaption>
+						<TableHeader>
+							<TableRow>
+								<TableHead>Weapon</TableHead>
+								<TableHead>Attacks</TableHead>
+								<TableHead>Hits</TableHead>
+								<TableHead>Wounds</TableHead>
+								<TableHead>Failed Saves</TableHead>
+								<TableHead>Damage</TableHead>
+							</TableRow>
+						</TableHeader>
+						<TableBody>
+							{simulation.result.weapons.map((result) => (
+								<TableRow key={result.weapon.name}>
+									<TableCell>{result.weapon.name}</TableCell>
+									<TableCell>{result.attacks}</TableCell>
+									<TableCell>{result.hits}</TableCell>
+									<TableCell>{result.wounds}</TableCell>
+									<TableCell>{result.failedSaves}</TableCell>
+									<TableCell>{result.damage}</TableCell>
+								</TableRow>
+							))}
+						</TableBody>
+					</Table>
 				)}
-				{simulation.result?.weaponResults &&
-					Object.entries(simulation.result.weaponResults).map(([name, res]) => (
-						<div key={name} className="mt-4">
-							<h3 className="font-semibold">{name}</h3>
-							<p>Average attacks: {res.attacks}</p>
-							<p>Average hits: {res.hits}</p>
-							<p>Average wounds: {res.wounds}</p>
-						</div>
-					))}
 			</CardContent>
 		</Card>
 	);

@@ -1,5 +1,5 @@
 import { KeywordEnum, ModifierEnum } from "@/profiles/attacker/constants";
-import type { Weapon } from "@/profiles/attacker/types";
+import type { DiceValue, Weapon } from "@/profiles/attacker/types";
 import type { Defender, Unit } from "@/profiles/defender/types";
 import { rollDie } from "./dice";
 
@@ -53,7 +53,7 @@ export function shouldRerollWound(
 
 export function rollWounds(hits: number, weapon: Weapon, defender: Unit) {
 	let wounds = 0;
-	let devs = 0;
+	const devs: DiceValue[] = [];
 
 	const woundOn = getWoundMinRoll(weapon, defender);
 	const critOn = getCriticalWoundMinRoll(weapon);
@@ -62,7 +62,7 @@ export function rollWounds(hits: number, weapon: Weapon, defender: Unit) {
 	for (let i = 0; i < hits; i++) {
 		let roll = rollDie(6);
 		if (shouldRerollWound(roll, weapon, woundOn)) roll = rollDie(6);
-		if (devWounds && roll >= critOn) devs++;
+		if (devWounds && roll >= critOn) devs.push(weapon.damage);
 		else if (roll >= woundOn) wounds++;
 	}
 
