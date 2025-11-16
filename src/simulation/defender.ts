@@ -38,8 +38,9 @@ export class SimDefender {
 	}
 
 	public takeDamage(damage: number): number {
-		const wounds = this.currentUnit.wounds;
+		if (this.isDefeated) return 0;
 
+		const wounds = this.currentUnit.wounds;
 		this.currentUnit.wounds -= damage;
 		if (this.currentUnit.wounds > 0) return damage;
 
@@ -47,6 +48,7 @@ export class SimDefender {
 		if (this.isDefeated) return wounds;
 		if (this.currentUnit.models === 0) this.currentUnitIndex++;
 		this.currentUnit.wounds = this.currentUnitMaxWounds;
+
 		return wounds;
 	}
 }

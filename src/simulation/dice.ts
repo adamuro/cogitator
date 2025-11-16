@@ -8,7 +8,7 @@ export function rollDice(dice: DiceValue): number {
 	if (!dice.includes("D")) return Number(dice);
 
 	const [times, sides] = dice.split("D").map(Number);
-	if (!times || times <= 0 || !sides || sides <= 0) {
+	if ((times && times <= 0) || !sides || sides <= 0) {
 		throw new Error(`Invalid dice format: ${dice}`);
 	}
 

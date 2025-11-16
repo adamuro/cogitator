@@ -2,20 +2,21 @@ import type { Attacker, DiceValue, Weapon } from "@/profiles/attacker/types";
 import type { Defender } from "@/profiles/defender/types";
 import { rollHits } from "./hits";
 import type { SimulationResult } from "./types";
-import { calculateAverages, initResult, updateResult } from "./result";
 import { rollWounds } from "./wounds";
 import { rollSaves } from "./saves";
 import { SimDefender } from "./defender";
 import { rollDice } from "./dice";
+import { initData, updateData } from "./data";
+import { calculateSimulationResult } from "./result";
 
 export function simulate(
 	attacker: Attacker,
 	defender: Defender,
-	times: number,
+	runs: number,
 ): SimulationResult {
-	const result = initResult(attacker);
+	const data = initData(attacker);
 
-	for (let i = 0; i < times; i++) {
+	for (let i = 0; i < runs; i++) {
 		const simDefender = new SimDefender(defender);
 		const totalDevs: DiceValue[] = [];
 
@@ -35,19 +36,18 @@ export function simulate(
 				simDefender,
 			);
 
-			updateResult(
-				result,
-				weapon,
+			updateData(
+				data,
 				index,
 				attacks,
 				hits + lethals,
-				lethals + wounds,
+				wounds + lethals,
 				failedSaves,
 				damage,
 			);
 		}
 	}
 
-	calculateAverages(result, times);
+	const result = calculateSimulationResult(data, runs);
 	return result;
 }

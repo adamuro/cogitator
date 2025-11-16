@@ -1,103 +1,85 @@
-import type { Attacker, Weapon } from "@/profiles/attacker/types";
-import type { SimulationResult } from "./types";
+import type {
+	SimulationData,
+	SimulationResult,
+	StatisticalResult,
+} from "./types";
 
-export function initResult(attacker: Attacker): SimulationResult {
+export function calculateSimulationResult(
+	data: SimulationData,
+	runs: number,
+): SimulationResult {
+	const result: SimulationResult = {
+		weapons: [],
+	};
+
+	for (const weaponData of data.weapons) {
+		const weaponResult = {
+			weapon: weaponData.weapon,
+			attacks: calculateStatisticalResult(
+				weaponData.results.map((r) => r.attacks),
+			),
+			hits: calculateStatisticalResult(weaponData.results.map((r) => r.hits)),
+			wounds: calculateStatisticalResult(
+				weaponData.results.map((r) => r.wounds),
+			),
+			failedSaves: calculateStatisticalResult(
+				weaponData.results.map((r) => r.failedSaves),
+			),
+			damage: calculateStatisticalResult(
+				weaponData.results.map((r) => r.damage),
+			),
+		};
+		result.weapons.push(weaponResult);
+	}
+
+	return result;
+}
+
+export function calculateStatisticalResult(
+	values: number[],
+): StatisticalResult {
+	const mean = Math.round(calculateMean(values) * 10) / 10;
+	const median = Math.round(calculateMedian(values) * 10) / 10;
+	const mode = Math.round(calculateMode(values) * 10) / 10;
+	const min = Math.min(...values);
+	const max = Math.max(...values);
+
 	return {
-		weapons: attacker.map((weapon) => ({
-			weapon,
-			attacks: 0,
-			hits: 0,
-			wounds: 0,
-			failedSaves: 0,
-			damage: 0,
-		})),
-		summary: {
-			attacks: 0,
-			hits: 0,
-			wounds: 0,
-			failedSaves: 0,
-			damage: 0,
-		},
+		mean,
+		median,
+		mode,
+		min,
+		max,
 	};
 }
 
-export function updateResult(
-	result: SimulationResult,
-	weapon: Weapon,
-	index: number,
-	attacks: number,
-	hits: number,
-	wounds: number,
-	failedSaves: number,
-	damage: number,
-) {
-	if (!result.weapons[index]) throw new Error("Weapon index out of bounds");
-
-	const attacksSum = result.weapons[index].attacks + attacks;
-	const hitsSum = result.weapons[index].hits + hits;
-	const woundsSum = result.weapons[index].wounds + wounds;
-	const failedSavesSum = result.weapons[index].failedSaves + failedSaves;
-	const damageSum = result.weapons[index].damage + damage;
-
-	result.weapons[index] = {
-		weapon: weapon,
-		attacks: attacksSum,
-		hits: hitsSum,
-		wounds: woundsSum,
-		failedSaves: failedSavesSum,
-		damage: damageSum,
-	};
-
-	result.summary.attacks += attacks;
-	result.summary.hits += hits;
-	result.summary.wounds += wounds;
-	result.summary.failedSaves += failedSaves;
-	result.summary.damage += damage;
+export function calculateMean(values: number[]): number {
+	const total = values.reduce((sum, val) => sum + val, 0);
+	return total / values.length;
 }
 
-export function updateWeaponResult(
-	result: SimulationResult,
-	weapon: Weapon,
-	index: number,
-	attacks: number,
-	hits: number,
-	wounds: number,
-	failedSaves: number,
-	damage: number,
-) {
-	if (!result.weapons[index]) throw new Error("Weapon index out of bounds");
+export function calculateMedian(values: number[]): number {
+	const sorted = [...values].sort((a, b) => a - b);
+	const midIndex = Math.floor(values.length / 2 - (values.length % 2 ? 0 : 1));
+	const midValue = sorted[midIndex];
+	if (!midValue) throw new Error("Cannot calculate median of empty array");
 
-	const attacksSum = result.weapons[index].attacks + attacks;
-	const hitsSum = result.weapons[index].hits + hits;
-	const woundsSum = result.weapons[index].wounds + wounds;
-	const failedSavesSum = result.weapons[index].failedSaves + failedSaves;
-	const damageSum = result.weapons[index].damage + damage;
-
-	result.weapons[index] = {
-		weapon: weapon,
-		attacks: attacksSum,
-		hits: hitsSum,
-		wounds: woundsSum,
-		failedSaves: failedSavesSum,
-		damage: damageSum,
-	};
+	return midValue;
 }
 
-export function calculateAverages(result: SimulationResult, times: number) {
-	result.weapons = result.weapons.map((result) => ({
-		weapon: result.weapon,
-		attacks: Math.round((result.attacks / times) * 10) / 10,
-		hits: Math.round((result.hits / times) * 10) / 10,
-		wounds: Math.round((result.wounds / times) * 10) / 10,
-		failedSaves: Math.round((result.failedSaves / times) * 10) / 10,
-		damage: Math.round((result.damage / times) * 10) / 10,
-	}));
+export function calculateMode(values: number[]): number {
+	const frequencyMap: Map<number, number> = new Map();
 
-	result.summary = {
-		attacks: Math.round((result.summary.attacks / times) * 10) / 10,
-		hits: Math.round((result.summary.hits / times) * 10) / 10,
-		wounds: Math.round((result.summary.wounds / times) * 10) / 10,
-		failedSaves: Math.round((result.summary.failedSaves / times) * 10) / 10,
-		damage: Math.round((result.summary.damage / times) * 10) / 10,
-	};
+	for (const value of values) {
+		const count = (frequencyMap.get(value) || 0) + 1;
+		frequencyMap.set(value, count);
+	}
+
+	const mode = Array.from(frequencyMap.entries()).reduce(
+		({ v, c }, [value, count]) =>
+			count > c ? { v: value, c: count } : { v, c },
+		{ v: 0, c: 0 },
+	);
+
+	return mode.v;
 }

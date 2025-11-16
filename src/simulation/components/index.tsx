@@ -6,18 +6,10 @@ import {
 	CardHeader,
 	CardTitle,
 } from "@/components/ui/card";
-import {
-	Table,
-	TableBody,
-	TableCaption,
-	TableCell,
-	TableHead,
-	TableHeader,
-	TableRow,
-} from "@/components/ui/table";
 import { useProfilesFormState } from "@/hooks/profiles";
 import { useSimulation } from "@/hooks/simulation";
 import { Play } from "lucide-react";
+import { WeaponsResults } from "./weapon";
 
 export function SimulationCard() {
 	const simulation = useSimulation();
@@ -44,31 +36,10 @@ export function SimulationCard() {
 			</CardHeader>
 			<CardContent>
 				{simulation.result && (
-					<Table>
-						<TableCaption>Simulated {simulation.runs} times</TableCaption>
-						<TableHeader>
-							<TableRow>
-								<TableHead>Weapon</TableHead>
-								<TableHead>Attacks</TableHead>
-								<TableHead>Hits</TableHead>
-								<TableHead>Wounds</TableHead>
-								<TableHead>Failed Saves</TableHead>
-								<TableHead>Damage</TableHead>
-							</TableRow>
-						</TableHeader>
-						<TableBody>
-							{simulation.result.weapons.map((result) => (
-								<TableRow key={result.weapon.name}>
-									<TableCell>{result.weapon.name}</TableCell>
-									<TableCell>{result.attacks}</TableCell>
-									<TableCell>{result.hits}</TableCell>
-									<TableCell>{result.wounds}</TableCell>
-									<TableCell>{result.failedSaves}</TableCell>
-									<TableCell>{result.damage}</TableCell>
-								</TableRow>
-							))}
-						</TableBody>
-					</Table>
+					<WeaponsResults
+						results={simulation.result.weapons}
+						runs={simulation.runs}
+					/>
 				)}
 			</CardContent>
 		</Card>
