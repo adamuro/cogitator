@@ -1,30 +1,24 @@
 import { z } from "zod";
 
+import { profilesSchema } from "@/profiles/schema";
 import { createTRPCRouter, publicProcedure } from "@/server/api/trpc";
-import { posts } from "@/server/db/schema";
+import { simulate } from "@/simulation";
 
-export const postRouter = createTRPCRouter({
-	hello: publicProcedure
-		.input(z.object({ text: z.string() }))
-		.query(({ input }) => {
-			return {
-				greeting: `Hello ${input.text}`,
-			};
+export const simulationRouter = createTRPCRouter({
+	run: publicProcedure
+		.input(
+			z.object({
+				profiles: profilesSchema,
+				runs: z.number().min(1).max(100000),
+			}),
+		)
+		.mutation(async ({ input }) => {
+			const result = simulate(
+				input.profiles.attacker,
+				input.profiles.defender,
+				input.runs,
+			);
+
+			return result;
 		}),
-
-	create: publicProcedure
-		.input(z.object({ name: z.string().min(1) }))
-		.mutation(async ({ ctx, input }) => {
-			await ctx.db.insert(posts).values({
-				name: input.name,
-			});
-		}),
-
-	getLatest: publicProcedure.query(async ({ ctx }) => {
-		const post = await ctx.db.query.posts.findFirst({
-			orderBy: (posts, { desc }) => [desc(posts.createdAt)],
-		});
-
-		return post ?? null;
-	}),
 });
