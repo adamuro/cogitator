@@ -10,6 +10,8 @@ export interface SimulationContextValue {
 	setRuns: SetStateType<number>;
 	result: SimulationResult | null;
 	setResult: SetStateType<SimulationResult | null>;
+	error: string | null;
+	setError: SetStateType<string | null>;
 }
 
 const initialValue: SimulationContextValue = {
@@ -17,6 +19,8 @@ const initialValue: SimulationContextValue = {
 	setRuns: () => {},
 	result: null,
 	setResult: () => {},
+	error: null,
+	setError: () => {},
 };
 
 export const SimulationContext =
@@ -25,12 +29,15 @@ export const SimulationContext =
 export function SimulationProvider(props: PropsWithChildren) {
 	const [runs, setRuns] = useState(DEFAULT_RUNS);
 	const [result, setResult] = useState<SimulationResult | null>(null);
+	const [error, setError] = useState<string | null>(null);
 
 	const value: SimulationContextValue = {
 		runs,
 		setRuns,
 		result,
 		setResult,
+		error,
+		setError,
 	};
 
 	return (

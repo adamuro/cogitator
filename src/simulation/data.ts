@@ -27,7 +27,7 @@ export function updateWeaponData(
 	failedSaves: number,
 	damage: number,
 ) {
-	if (!data.attacker[index]) throw new Error("Weapon index out of bounds");
+	if (!data.attacker[index]) throw new Error("Weapon index out of bounds.");
 
 	data.attacker[index].results.push({
 		attacks,

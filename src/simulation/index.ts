@@ -50,7 +50,6 @@ export function simulate(
 		updateDefenderData(data, simDefender.summary);
 	}
 
-	console.log(data.defender[0]?.results);
 	const result = calculateSimulationResult(data);
 	return result;
 }

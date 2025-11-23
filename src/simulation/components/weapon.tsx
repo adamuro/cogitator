@@ -35,7 +35,6 @@ export function WeaponsResults(props: WeaponResultsProps) {
 				</TabsList>
 			</Tabs>
 			<Table>
-				<TableCaption>Simulated {props.runs} times</TableCaption>
 				<TableHeader>
 					<TableRow>
 						<TableHead>Weapon</TableHead>
@@ -46,7 +45,7 @@ export function WeaponsResults(props: WeaponResultsProps) {
 						<TableHead>Damage</TableHead>
 					</TableRow>
 				</TableHeader>
-				<TableBody>
+				<TableBody className="border-b">
 					{props.results.map((result) => (
 						<TableRow key={result.weapon.name}>
 							<TableCell>{result.weapon.name}</TableCell>

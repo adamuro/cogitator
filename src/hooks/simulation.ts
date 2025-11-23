@@ -7,7 +7,11 @@ import { useContext } from "react";
 export function useSimulation() {
 	const simulation = useContext(SimulationContext);
 	const runSimulation = api.simulation.run.useMutation({
-		onSuccess: (result) => simulation.setResult(result),
+		onSuccess: (result) => {
+			simulation.setError(null);
+			simulation.setResult(result);
+		},
+		onError: (err) => simulation.setError(err.message),
 	});
 
 	function run(attacker: Attacker, defender: Defender) {
@@ -22,5 +26,6 @@ export function useSimulation() {
 		setRuns: simulation.setRuns,
 		run,
 		result: simulation.result,
+		error: simulation.error,
 	};
 }

@@ -78,7 +78,6 @@ export function calculateMean(values: number[]): number {
 }
 
 export function calculateMedian(values: number[]): number {
-	console.log(values);
 	const sorted = [...values].sort((a, b) => a - b);
 	const midIndex = Math.floor(values.length / 2 - (values.length % 2 ? 0 : 1));
 	const midValue = sorted[midIndex];

@@ -1,18 +1,15 @@
 import {
-  Table,
-  TableBody,
-  TableCaption,
-  TableCell,
-  TableHead,
-  TableHeader,
-  TableRow,
+	Table,
+	TableBody,
+	TableCaption,
+	TableCell,
+	TableHead,
+	TableHeader,
+	TableRow,
 } from "@/components/ui/table";
 import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { useState } from "react";
-import type {
-  StatisticalResultEntry,
-  UnitStatisticalResult
-} from "../types";
+import type { StatisticalResultEntry, UnitStatisticalResult } from "../types";
 
 interface UnitResultsProps {
 	results: UnitStatisticalResult[];
@@ -44,7 +41,7 @@ export function UnitsResults(props: UnitResultsProps) {
 						<TableHead>Wounds Lost</TableHead>
 					</TableRow>
 				</TableHeader>
-				<TableBody>
+				<TableBody className="border-b">
 					{props.results.map((result) => (
 						<TableRow key={result.unit.name}>
 							<TableCell>{result.unit.name}</TableCell>

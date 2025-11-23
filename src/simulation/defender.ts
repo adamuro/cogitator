@@ -9,7 +9,7 @@ export class SimDefender {
 
 	constructor(defender: Defender) {
 		if (defender.length === 0) {
-			throw new Error("Defender must have at least one unit");
+			throw new Error("Defender must have at least one unit.");
 		}
 
 		this.originalDefender = structuredClone(defender);
@@ -18,7 +18,7 @@ export class SimDefender {
 
 	private get currentUnitMaxWounds(): number {
 		const unit = this.originalDefender[this.currentUnitIndex];
-		if (!unit) throw new Error("No current unit available");
+		if (!unit) throw new Error("No current unit available.");
 
 		return unit.wounds;
 	}
@@ -29,7 +29,7 @@ export class SimDefender {
 
 	public get currentUnit(): Unit {
 		const unit = this.defender[this.currentUnitIndex] ?? this.defender[0];
-		if (!unit) throw new Error("No current unit available");
+		if (!unit) throw new Error("No current unit available.");
 
 		return unit;
 	}
@@ -41,7 +41,7 @@ export class SimDefender {
 	public get summary(): UnitResult[] {
 		return this.defender.map((unit, index) => {
 			const originalUnit = this.originalDefender[index];
-			if (!originalUnit) throw new Error("Original unit not found");
+			if (!originalUnit) throw new Error("Original unit not found.");
 
 			return {
 				modelsRemaining: unit.models,
