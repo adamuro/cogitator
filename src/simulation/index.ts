@@ -6,7 +6,7 @@ import { rollWounds } from "./wounds";
 import { rollSaves } from "./saves";
 import { SimDefender } from "./defender";
 import { rollDice } from "./dice";
-import { initData, updateData } from "./data";
+import { initData, updateDefenderData, updateWeaponData } from "./data";
 import { calculateSimulationResult } from "./result";
 
 export function simulate(
@@ -14,7 +14,7 @@ export function simulate(
 	defender: Defender,
 	runs: number,
 ): SimulationResult {
-	const data = initData(attacker);
+	const data = initData(attacker, defender);
 
 	for (let i = 0; i < runs; i++) {
 		const simDefender = new SimDefender(defender);
@@ -36,7 +36,7 @@ export function simulate(
 				simDefender,
 			);
 
-			updateData(
+			updateWeaponData(
 				data,
 				index,
 				attacks,
@@ -46,8 +46,11 @@ export function simulate(
 				damage,
 			);
 		}
+
+		updateDefenderData(data, simDefender.summary);
 	}
 
-	const result = calculateSimulationResult(data, runs);
+	console.log(data.defender[0]?.results);
+	const result = calculateSimulationResult(data);
 	return result;
 }

@@ -1,5 +1,6 @@
 import type { Defender, Unit } from "@/profiles/defender/types";
 import { th } from "zod/v4/locales";
+import type { UnitResult } from "./types";
 
 export class SimDefender {
 	private originalDefender: Defender;
@@ -37,11 +38,27 @@ export class SimDefender {
 		return this.defender.every((unit) => unit.models === 0);
 	}
 
+	public get summary(): UnitResult[] {
+		return this.defender.map((unit, index) => {
+			const originalUnit = this.originalDefender[index];
+			if (!originalUnit) throw new Error("Original unit not found");
+
+			return {
+				modelsRemaining: unit.models,
+				woundsRemaining: unit.models * originalUnit.wounds + unit.wounds,
+				modelsLost: originalUnit.models - unit.models,
+				woundsLost:
+					(originalUnit.models - unit.models) * originalUnit.wounds +
+					(originalUnit.wounds - unit.wounds) * (unit.models > 0 ? 1 : 0),
+			};
+		});
+	}
+
 	public takeDamage(damage: number): number {
 		if (this.isDefeated) return 0;
 
 		const wounds = this.currentUnit.wounds;
-		this.currentUnit.wounds -= damage;
+		this.currentUnit.wounds = Math.max(0, wounds - damage);
 		if (this.currentUnit.wounds > 0) return damage;
 
 		this.currentUnit.models -= 1;

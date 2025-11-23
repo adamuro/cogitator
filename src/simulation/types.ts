@@ -1,4 +1,5 @@
 import type { Weapon } from "@/profiles/attacker/types";
+import type { Unit } from "@/profiles/defender/types";
 
 export interface WeaponResult {
 	attacks: number;
@@ -13,8 +14,21 @@ export interface WeaponSimulationData {
 	results: WeaponResult[];
 }
 
+export interface UnitResult {
+	modelsRemaining: number;
+	woundsRemaining: number;
+	modelsLost: number;
+	woundsLost: number;
+}
+
+export interface UnitSimulationData {
+	unit: Unit;
+	results: UnitResult[];
+}
+
 export interface SimulationData {
-	weapons: WeaponSimulationData[];
+	attacker: WeaponSimulationData[];
+	defender: UnitSimulationData[];
 }
 
 export interface StatisticalResult {
@@ -25,6 +39,8 @@ export interface StatisticalResult {
 	max: number;
 }
 
+export type StatisticalResultEntry = keyof StatisticalResult;
+
 export interface WeaponStatisticalResult {
 	weapon: Weapon;
 	attacks: StatisticalResult;
@@ -34,6 +50,15 @@ export interface WeaponStatisticalResult {
 	damage: StatisticalResult;
 }
 
+export interface UnitStatisticalResult {
+	unit: Unit;
+	modelsRemaining: StatisticalResult;
+	woundsRemaining: StatisticalResult;
+	modelsLost: StatisticalResult;
+	woundsLost: StatisticalResult;
+}
+
 export interface SimulationResult {
-	weapons: WeaponStatisticalResult[];
+	attacker: WeaponStatisticalResult[];
+	defender: UnitStatisticalResult[];
 }

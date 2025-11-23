@@ -1,16 +1,24 @@
 import type { Attacker } from "@/profiles/attacker/types";
-import type { SimulationData } from "./types";
+import type { SimulationData, UnitResult } from "./types";
+import type { Defender } from "@/profiles/defender/types";
 
-export function initData(attacker: Attacker): SimulationData {
+export function initData(
+	attacker: Attacker,
+	defender: Defender,
+): SimulationData {
 	return {
-		weapons: attacker.map((weapon) => ({
+		attacker: attacker.map((weapon) => ({
 			weapon,
+			results: [],
+		})),
+		defender: defender.map((unit) => ({
+			unit,
 			results: [],
 		})),
 	};
 }
 
-export function updateData(
+export function updateWeaponData(
 	data: SimulationData,
 	index: number,
 	attacks: number,
@@ -19,13 +27,21 @@ export function updateData(
 	failedSaves: number,
 	damage: number,
 ) {
-	if (!data.weapons[index]) throw new Error("Weapon index out of bounds");
+	if (!data.attacker[index]) throw new Error("Weapon index out of bounds");
 
-	data.weapons[index].results.push({
+	data.attacker[index].results.push({
 		attacks,
 		hits,
 		wounds,
 		failedSaves,
 		damage,
+	});
+}
+
+export function updateDefenderData(data: SimulationData, result: UnitResult[]) {
+	data.defender.forEach((unitData, index) => {
+		if (!result[index]) throw new Error("Unit index out of bounds");
+
+		unitData.results.push(result[index]);
 	});
 }

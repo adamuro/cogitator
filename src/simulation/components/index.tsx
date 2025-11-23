@@ -10,10 +10,12 @@ import { useProfilesFormState } from "@/hooks/profiles";
 import { useSimulation } from "@/hooks/simulation";
 import { Play } from "lucide-react";
 import { WeaponsResults } from "./weapon";
+import { UnitsResults } from "./unit";
 
 export function SimulationCard() {
 	const simulation = useSimulation();
 	const { isValid } = useProfilesFormState();
+	console.log(simulation.result?.defender);
 
 	return (
 		<Card className="h-fit gap-2 pt-3 pb-4">
@@ -36,10 +38,16 @@ export function SimulationCard() {
 			</CardHeader>
 			<CardContent>
 				{simulation.result && (
-					<WeaponsResults
-						results={simulation.result.weapons}
-						runs={simulation.runs}
-					/>
+					<>
+						<WeaponsResults
+							results={simulation.result.attacker}
+							runs={simulation.runs}
+						/>
+						<UnitsResults
+							results={simulation.result.defender}
+							runs={simulation.runs}
+						/>
+					</>
 				)}
 			</CardContent>
 		</Card>

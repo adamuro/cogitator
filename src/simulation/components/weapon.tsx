@@ -1,5 +1,3 @@
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import type { StatisticalResult, WeaponStatisticalResult } from "../types";
 import {
 	Table,
 	TableBody,
@@ -9,9 +7,9 @@ import {
 	TableHeader,
 	TableRow,
 } from "@/components/ui/table";
+import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { useState } from "react";
-
-type TabValue = keyof StatisticalResult;
+import type { StatisticalResultEntry, WeaponStatisticalResult } from "../types";
 
 interface WeaponResultsProps {
 	results: WeaponStatisticalResult[];
@@ -19,13 +17,13 @@ interface WeaponResultsProps {
 }
 
 export function WeaponsResults(props: WeaponResultsProps) {
-	const [tab, setTab] = useState<TabValue>("mean");
+	const [tab, setTab] = useState<StatisticalResultEntry>("mean");
 
 	return (
 		<>
 			<Tabs
 				value={tab}
-				onValueChange={(value) => setTab(value as TabValue)}
+				onValueChange={(value) => setTab(value as StatisticalResultEntry)}
 				className="items-center py-2"
 			>
 				<TabsList>

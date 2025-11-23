@@ -6,13 +6,13 @@ import type {
 
 export function calculateSimulationResult(
 	data: SimulationData,
-	runs: number,
 ): SimulationResult {
 	const result: SimulationResult = {
-		weapons: [],
+		attacker: [],
+		defender: [],
 	};
 
-	for (const weaponData of data.weapons) {
+	for (const weaponData of data.attacker) {
 		const weaponResult = {
 			weapon: weaponData.weapon,
 			attacks: calculateStatisticalResult(
@@ -29,7 +29,26 @@ export function calculateSimulationResult(
 				weaponData.results.map((r) => r.damage),
 			),
 		};
-		result.weapons.push(weaponResult);
+		result.attacker.push(weaponResult);
+	}
+
+	for (const unitData of data.defender) {
+		const unitResult = {
+			unit: unitData.unit,
+			modelsRemaining: calculateStatisticalResult(
+				unitData.results.map((r) => r.modelsRemaining),
+			),
+			woundsRemaining: calculateStatisticalResult(
+				unitData.results.map((r) => r.woundsRemaining),
+			),
+			modelsLost: calculateStatisticalResult(
+				unitData.results.map((r) => r.modelsLost),
+			),
+			woundsLost: calculateStatisticalResult(
+				unitData.results.map((r) => r.woundsLost),
+			),
+		};
+		result.defender.push(unitResult);
 	}
 
 	return result;
@@ -59,10 +78,12 @@ export function calculateMean(values: number[]): number {
 }
 
 export function calculateMedian(values: number[]): number {
+	console.log(values);
 	const sorted = [...values].sort((a, b) => a - b);
 	const midIndex = Math.floor(values.length / 2 - (values.length % 2 ? 0 : 1));
 	const midValue = sorted[midIndex];
-	if (!midValue) throw new Error("Cannot calculate median of empty array");
+	if (midValue === undefined)
+		throw new Error("Cannot calculate median of empty array");
 
 	return midValue;
 }
