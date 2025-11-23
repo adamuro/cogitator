@@ -1,5 +1,5 @@
 import { emptyNumberFieldValue } from "@/lib/form";
-import type { Weapon } from "./types";
+import type { DiceValue, Weapon } from "./types";
 import { WEAPON_NAMES } from "./constants";
 
 export function randomWeaponName() {
@@ -13,11 +13,11 @@ export function randomWeaponName() {
 export function newWeapon(): Weapon {
 	return {
 		name: randomWeaponName(),
-		attacks: "",
+		attacks: "" as unknown as DiceValue,
 		skill: emptyNumberFieldValue(),
 		strength: emptyNumberFieldValue(),
 		ap: emptyNumberFieldValue(),
-		damage: "",
+		damage: "" as unknown as DiceValue,
 		keywords: [],
 		modifiers: [],
 	};

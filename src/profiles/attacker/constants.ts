@@ -1,6 +1,6 @@
 import type { MultiSelectOption } from "@/components/ui/multi-select";
 import { emptyNumberFieldValue } from "@/lib/form";
-import type { Weapon } from "./types";
+import type { DiceValue, Weapon } from "./types";
 // import { randomWeaponName } from "./utils";
 
 /* Value ranges */
@@ -69,11 +69,11 @@ export const MODIFIER_SELECT_OPTIONS: MultiSelectOption[] = MODIFIERS.map(
 /* Default values*/
 export const DEFAULT_WEAPON_VALUES: Weapon = {
 	name: "",
-	attacks: "",
+	attacks: "" as unknown as DiceValue,
 	skill: emptyNumberFieldValue(),
 	strength: emptyNumberFieldValue(),
 	ap: emptyNumberFieldValue(),
-	damage: "",
+	damage: "" as unknown as DiceValue,
 	keywords: [],
 	modifiers: [],
 } as const;
