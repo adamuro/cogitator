@@ -4,8 +4,11 @@ export function rollDie(sides: number): number {
 	return Math.floor(Math.random() * sides) + 1;
 }
 
-export function rollDice(dice: DiceValue): number {
-	if (!dice.includes("D")) return Number(dice);
+export function rollDice(diceValue: DiceValue): number {
+	if (!diceValue.includes("D")) return Number(diceValue);
+
+	const [dice, flat] = diceValue.split("+");
+	if (!dice) throw new Error(`Invalid dice format: ${diceValue}`);
 
 	const [times, sides] = dice.split("D").map(Number);
 	if ((times && times <= 0) || !sides || sides <= 0) {
@@ -14,5 +17,5 @@ export function rollDice(dice: DiceValue): number {
 
 	let result = 0;
 	for (let i = 0; i < (times || 1); i++) result += rollDie(sides);
-	return result;
+	return result + (flat ? Number(flat) : 0);
 }

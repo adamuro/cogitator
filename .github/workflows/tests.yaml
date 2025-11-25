@@ -1,4 +1,4 @@
-name: Test
+name: Tests
 
 
 on:
@@ -10,10 +10,6 @@ on:
 jobs:
   test:
     runs-on: ubuntu-latest
-    strategy:
-      matrix:
-        node-version: [18, 20, 22]
-
     steps:
       - name: Checkout code
         uses: actions/checkout@v4

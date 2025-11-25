@@ -25,6 +25,26 @@ describe("dice number regex", () => {
 		expect(DICE_NUMBER_REGEX.test("66D3")).toBeTruthy();
 	});
 
+	it("matches a single die with added flat bonus", () => {
+		expect(DICE_NUMBER_REGEX.test("D6+1")).toBeTruthy();
+		expect(DICE_NUMBER_REGEX.test("D6+3")).toBeTruthy();
+		expect(DICE_NUMBER_REGEX.test("D3+5")).toBeTruthy();
+		expect(DICE_NUMBER_REGEX.test("D3+1")).toBeTruthy();
+	});
+
+	it("matches multiple dice with added flat bonus", () => {
+		expect(DICE_NUMBER_REGEX.test("2D6+1")).toBeTruthy();
+		expect(DICE_NUMBER_REGEX.test("10D6+5")).toBeTruthy();
+		expect(DICE_NUMBER_REGEX.test("13D6+3")).toBeTruthy();
+		expect(DICE_NUMBER_REGEX.test("99D6+10")).toBeTruthy();
+		expect(DICE_NUMBER_REGEX.test("2D6+33")).toBeTruthy();
+		expect(DICE_NUMBER_REGEX.test("10D6+99")).toBeTruthy();
+		expect(DICE_NUMBER_REGEX.test("6D3+2")).toBeTruthy();
+		expect(DICE_NUMBER_REGEX.test("66D3+7")).toBeTruthy();
+		expect(DICE_NUMBER_REGEX.test("33D3+33")).toBeTruthy();
+		expect(DICE_NUMBER_REGEX.test("2D3+99")).toBeTruthy();
+	});
+
 	it("fails on numbers from outside the scope", () => {
 		expect(DICE_NUMBER_REGEX.test("0")).toBeFalsy();
 		expect(DICE_NUMBER_REGEX.test("-1")).toBeFalsy();
