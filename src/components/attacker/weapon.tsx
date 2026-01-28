@@ -19,7 +19,7 @@ import { processNumberFieldValue } from "@/lib/form";
 import { randomWeaponName } from "@/profiles/attacker/utils";
 import { useSortable } from "@dnd-kit/sortable";
 import { CSS } from "@dnd-kit/utilities";
-import { EllipsisVertical, Trash } from "lucide-react";
+import { Copy, EllipsisVertical, Trash } from "lucide-react";
 import { useMemo } from "react";
 import { Controller } from "react-hook-form";
 import {
@@ -35,12 +35,14 @@ import { MultiSelect } from "../ui/multi-select";
 interface WeaponProps {
 	id: string;
 	index: number;
+	onCopy: () => void;
 	onRemove: () => void;
 }
 
 export function WeaponForm(props: WeaponProps) {
 	const form = useProfilesFormContext();
-	const placeholderName = useMemo(() => randomWeaponName(), []);
+	const weapons = form.watch("attacker");
+	const placeholderName = useMemo(() => randomWeaponName(weapons), [weapons]);
 
 	/* DnD Kit Sortable */
 	const { attributes, listeners, setNodeRef, transform, transition } =
@@ -60,19 +62,20 @@ export function WeaponForm(props: WeaponProps) {
 		>
 			<FieldGroup
 				key={props.id}
-				className="grid grid-cols-2 lg:grid-cols-3 2xl:grid-cols-5"
+				className="grid grid-cols-2 gap-y-3 lg:grid-cols-3 2xl:grid-cols-5"
 			>
 				<Controller
 					name={`attacker.${props.index}.attacks`}
 					control={form.control}
 					render={({ field, fieldState }) => (
-						<Field data-invalid={fieldState.invalid}>
+						<Field data-invalid={fieldState.invalid} autoFocus={false}>
 							<FieldLabel>Attacks</FieldLabel>
 							<Input
 								{...field}
 								aria-invalid={fieldState.invalid}
 								placeholder="4, D6, 2D3"
 								autoComplete="off"
+								autoFocus={false}
 								className="text-center"
 								onChange={(e) => field.onChange(e.target.value)}
 							/>
@@ -238,7 +241,7 @@ export function WeaponForm(props: WeaponProps) {
 					name={`attacker.${props.index}.name`}
 					control={form.control}
 					render={({ field, fieldState }) => (
-						<Field data-invalid={fieldState.invalid} className="lg:hidden">
+						<Field data-invalid={fieldState.invalid} className="2xl:hidden">
 							<FieldLabel>Name</FieldLabel>
 							<Input
 								{...field}
@@ -258,7 +261,7 @@ export function WeaponForm(props: WeaponProps) {
 					render={({ field, fieldState }) => (
 						<Field
 							data-invalid={fieldState.invalid}
-							className="col-span-2 2xl:col-span-4"
+							className="col-span-2 2xl:col-span-3"
 						>
 							<FieldLabel>Keywords</FieldLabel>
 							<MultiSelect
@@ -276,7 +279,10 @@ export function WeaponForm(props: WeaponProps) {
 					name={`attacker.${props.index}.name`}
 					control={form.control}
 					render={({ field, fieldState }) => (
-						<Field data-invalid={fieldState.invalid} className="hidden lg:flex">
+						<Field
+							data-invalid={fieldState.invalid}
+							className="hidden 2xl:col-span-2 2xl:flex"
+						>
 							<FieldLabel>Name</FieldLabel>
 							<Input
 								{...field}
@@ -290,13 +296,19 @@ export function WeaponForm(props: WeaponProps) {
 						</Field>
 					)}
 				/>
+				<Field className="col-span-2 hidden lg:col-span-1 lg:flex 2xl:hidden">
+					<FieldLabel className="h-0 lg:h-fit">&nbsp;</FieldLabel>
+					<Button type="button" onClick={props.onCopy}>
+						<Copy /> Copy
+					</Button>
+				</Field>
 				<Controller
 					name={`attacker.${props.index}.modifiers`}
 					control={form.control}
 					render={({ field, fieldState }) => (
 						<Field
 							data-invalid={fieldState.invalid}
-							className="col-span-2 2xl:col-span-4"
+							className="col-span-2 2xl:col-span-3"
 						>
 							<FieldLabel>Modifiers</FieldLabel>
 							<MultiSelect
@@ -310,6 +322,12 @@ export function WeaponForm(props: WeaponProps) {
 						</Field>
 					)}
 				/>
+				<Field className="col-span-2 lg:col-span-1 lg:hidden 2xl:flex">
+					<FieldLabel className="h-0 lg:h-fit">&nbsp;</FieldLabel>
+					<Button type="button" onClick={props.onCopy}>
+						<Copy /> Copy
+					</Button>
+				</Field>
 				<Field className="col-span-2 lg:col-span-1">
 					<FieldLabel className="h-0 lg:h-fit">&nbsp;</FieldLabel>
 					<Button type="button" variant="destructive" onClick={props.onRemove}>

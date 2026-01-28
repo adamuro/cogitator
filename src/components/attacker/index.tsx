@@ -15,7 +15,7 @@ import {
 	useProfilesFormContext,
 } from "@/hooks/profiles";
 import { getDragIndices } from "@/lib/dnd";
-import { newWeapon } from "@/profiles/attacker/utils";
+import { newWeapon, randomWeaponName } from "@/profiles/attacker/utils";
 import {
 	DndContext,
 	type DragEndEvent,
@@ -30,7 +30,6 @@ import {
 	verticalListSortingStrategy,
 } from "@dnd-kit/sortable";
 import { Plus } from "lucide-react";
-import { useEffect } from "react";
 import {
 	Accordion,
 	AccordionContent,
@@ -41,6 +40,8 @@ import { WeaponForm } from "./weapon";
 
 export function AttackerCard() {
 	const attacker = useAttackerFieldArray();
+	const form = useProfilesFormContext();
+	const weapons = form.watch("attacker");
 
 	/* DnD Kit */
 	const sensors = useSensors(useSensor(TouchSensor), useSensor(MouseSensor));
@@ -66,7 +67,7 @@ export function AttackerCard() {
 						</AccordionTrigger>
 					</CardHeader>
 					<AccordionContent>
-						<CardContent>
+						<CardContent className="px-0">
 							<DndContext
 								sensors={sensors}
 								collisionDetection={closestCenter}
@@ -76,13 +77,19 @@ export function AttackerCard() {
 									items={attacker.fields.map((weapon) => weapon.id)}
 									strategy={verticalListSortingStrategy}
 								>
-									<ul className="divide-y *:not-first:pt-4">
+									<ul className="divide-y *:not-first:pt-4 *:pr-4 *:pl-6 *:last:bg-linear-to-b *:last:from-90% *:last:to-card *:even:bg-background/40">
 										{attacker.fields.map((weapon, index) => (
 											<WeaponForm
 												key={weapon.id}
 												id={weapon.id}
 												index={index}
 												onRemove={() => attacker.remove(index)}
+												onCopy={() =>
+													attacker.insert(index + 1, {
+														...weapon,
+														name: randomWeaponName(weapons),
+													})
+												}
 											/>
 										))}
 									</ul>
@@ -93,7 +100,7 @@ export function AttackerCard() {
 							<Field>
 								<Button
 									type="button"
-									onClick={() => attacker.append(newWeapon())}
+									onClick={() => attacker.append(newWeapon(weapons))}
 								>
 									<Plus />
 									Add Weapon

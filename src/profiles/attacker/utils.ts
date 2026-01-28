@@ -1,18 +1,21 @@
 import { emptyNumberFieldValue } from "@/lib/form";
-import type { DiceValue, Weapon } from "./types";
 import { WEAPON_NAMES } from "./constants";
+import type { Attacker, DiceValue, Weapon } from "./types";
 
-export function randomWeaponName() {
-	const index = Math.floor(Math.random() * WEAPON_NAMES.length);
-	const name = WEAPON_NAMES[index];
+export function randomWeaponName(attacker: Attacker): string {
+	const usedNames = attacker.map(({ name }) => name);
+	const unusedNames = WEAPON_NAMES.filter((name) => !usedNames.includes(name));
+	const weapons = unusedNames.length > 0 ? unusedNames : WEAPON_NAMES;
+	const index = Math.floor(Math.random() * weapons.length);
+	const name = weapons[index];
 	if (!name) throw new Error("Failed to select a random weapon name");
 
 	return name;
 }
 
-export function newWeapon(): Weapon {
+export function newWeapon(attacker: Attacker): Weapon {
 	return {
-		name: randomWeaponName(),
+		name: randomWeaponName(attacker),
 		attacks: "" as unknown as DiceValue,
 		skill: emptyNumberFieldValue(),
 		strength: emptyNumberFieldValue(),

@@ -40,12 +40,12 @@ export const KEYWORD_SELECT_OPTIONS: MultiSelectOption[] = KEYWORDS.map(
 export enum ModifierEnum {
 	HitsCritOn5 = "Hits crit on 5+",
 	WoundsCritOn5 = "Wounds crit on 5+",
-	ReRollOnesToHit = "Re-roll ones to hit",
-	ReRollFailedHits = "Re-roll failed hits",
-	ReRollNonCritHits = "Re-roll non-crit hits",
-	ReRollOnesToWound = "Re-roll ones to wound",
-	ReRollFailedWounds = "Re-roll failed wounds",
-	ReRollNonCritWounds = "Re-roll non-crit wounds",
+	ReRollOnesToHit = "Reroll 1 to hit",
+	ReRollFailedHits = "Reroll failed hits",
+	ReRollNonCritHits = "Reroll non-crit hits",
+	ReRollOnesToWound = "Reroll 1 to wound",
+	ReRollFailedWounds = "Reroll failed wounds",
+	ReRollNonCritWounds = "Reroll non-crit wounds",
 }
 
 export const MODIFIERS = [

@@ -6,7 +6,6 @@ import {
 	FieldError,
 	FieldGroup,
 	FieldLabel,
-	FieldSeparator,
 } from "@/components/ui/field";
 import { Input } from "@/components/ui/input";
 import {
@@ -28,22 +27,23 @@ import {
 	MIN_WOUNDS,
 } from "@/profiles/defender/constants";
 import { randomUnitName } from "@/profiles/defender/utils";
-import type { ProfilesSchemaType } from "@/profiles/schema";
 import { useSortable } from "@dnd-kit/sortable";
 import { CSS } from "@dnd-kit/utilities";
-import { EllipsisVertical, Trash } from "lucide-react";
+import { Copy, EllipsisVertical, Trash } from "lucide-react";
 import { useMemo } from "react";
-import { Controller, useFormContext } from "react-hook-form";
+import { Controller } from "react-hook-form";
 
 interface DefenderProps {
 	id: string;
 	index: number;
+	onCopy: () => void;
 	onRemove: () => void;
 }
 
 export function UnitForm(props: DefenderProps) {
 	const form = useProfilesFormContext();
-	const placeholderName = useMemo(() => randomUnitName(), []);
+	const units = form.watch("defender");
+	const placeholderName = useMemo(() => randomUnitName(units), [units]);
 
 	/* DnD Kit Sortable */
 	const { attributes, listeners, setNodeRef, transform, transition } =
@@ -60,7 +60,7 @@ export function UnitForm(props: DefenderProps) {
 			style={style}
 			className="relative flex items-center space-x-4 space-y-6 py-0"
 		>
-			<FieldGroup className="grid grid-cols-2 lg:grid-cols-3 2xl:grid-cols-4">
+			<FieldGroup className="grid grid-cols-2 gap-y-3 lg:grid-cols-3 2xl:grid-cols-5">
 				<Controller
 					name={`defender.${props.index}.models`}
 					control={form.control}
@@ -199,7 +199,10 @@ export function UnitForm(props: DefenderProps) {
 					name={`defender.${props.index}.name`}
 					control={form.control}
 					render={({ field, fieldState }) => (
-						<Field data-invalid={fieldState.invalid} className="2xl:col-span-1">
+						<Field
+							data-invalid={fieldState.invalid}
+							className="col-span-2 hidden 2xl:flex"
+						>
 							<FieldLabel>Name</FieldLabel>
 							<Input
 								{...field}
@@ -357,8 +360,35 @@ export function UnitForm(props: DefenderProps) {
 						</Field>
 					)}
 				/>
-				<Field className="lg:col-span-1">
+				<Controller
+					name={`defender.${props.index}.name`}
+					control={form.control}
+					render={({ field, fieldState }) => (
+						<Field
+							data-invalid={fieldState.invalid}
+							className="col-span-2 lg:col-span-1 2xl:hidden"
+						>
+							<FieldLabel>Name</FieldLabel>
+							<Input
+								{...field}
+								aria-invalid={fieldState.invalid}
+								placeholder={placeholderName}
+								autoComplete="off"
+								className="text-center"
+								onChange={(e) => field.onChange(e.target.value)}
+							/>
+							{fieldState.invalid && <FieldError errors={[fieldState.error]} />}
+						</Field>
+					)}
+				/>
+				<Field className="col-span-2 lg:col-span-1">
 					<FieldLabel>&nbsp;</FieldLabel>
+					<Button type="button" onClick={props.onCopy}>
+						<Copy /> Copy
+					</Button>
+				</Field>
+				<Field className="col-span-2 lg:col-span-1">
+					<FieldLabel className="h-0 lg:h-fit">&nbsp;</FieldLabel>
 					<Button type="button" variant="destructive" onClick={props.onRemove}>
 						<Trash /> Remove
 					</Button>

@@ -15,7 +15,7 @@ import {
 	useProfilesFormContext,
 } from "@/hooks/profiles";
 import { getDragIndices } from "@/lib/dnd";
-import { newUnit } from "@/profiles/defender/utils";
+import { newUnit, randomUnitName } from "@/profiles/defender/utils";
 import {
 	DndContext,
 	type DragEndEvent,
@@ -40,6 +40,8 @@ import { UnitForm } from "./unit";
 
 export function DefenderUnitCard() {
 	const defender = useDefenderFieldArray();
+	const form = useProfilesFormContext();
+	const units = form.watch("defender");
 
 	/* DnD Kit */
 	const sensors = useSensors(useSensor(TouchSensor), useSensor(MouseSensor));
@@ -65,7 +67,7 @@ export function DefenderUnitCard() {
 						</AccordionTrigger>
 					</CardHeader>
 					<AccordionContent>
-						<CardContent>
+						<CardContent className="px-0">
 							<DndContext
 								sensors={sensors}
 								collisionDetection={closestCenter}
@@ -75,13 +77,19 @@ export function DefenderUnitCard() {
 									items={defender.fields.map((unit) => unit.id)}
 									strategy={verticalListSortingStrategy}
 								>
-									<ul className="divide-y *:not-first:pt-4">
+									<ul className="divide-y *:not-first:pt-4 *:pr-4 *:pl-6 *:last:bg-linear-to-b *:last:from-90% *:last:to-card *:even:bg-background/40">
 										{defender.fields.map((unit, index) => (
 											<UnitForm
 												key={unit.id}
 												id={unit.id}
 												index={index}
 												onRemove={() => defender.remove(index)}
+												onCopy={() =>
+													defender.insert(index + 1, {
+														...unit,
+														name: randomUnitName(units),
+													})
+												}
 											/>
 										))}
 									</ul>
@@ -92,7 +100,7 @@ export function DefenderUnitCard() {
 							<Field>
 								<Button
 									type="button"
-									onClick={() => defender.append(newUnit())}
+									onClick={() => defender.append(newUnit(units))}
 								>
 									<Plus />
 									Add Defender
